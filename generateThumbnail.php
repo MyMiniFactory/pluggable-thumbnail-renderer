@@ -162,8 +162,6 @@ foreach ($filesToProcess as $file) {
         // Adding the template to the pov files
         file_put_contents($fileName, $template, FILE_APPEND);
 
-        copy($fileName, $OUTPUTARG.'/thumbnail-'.$file["objectName"].'.pov');
-
         // Generating the frames
         $Width = 300;
         $Height = 300;
