@@ -19,7 +19,7 @@ RUN apt-get update && \
     apt-get -y purge && \
     git clone https://github.com/MyMiniFactory/Fast-Quadric-Mesh-Simplification && \
     make -C Fast-Quadric-Mesh-Simplification/ && \
-    cp Fast-Quadric-Mesh-Simplification/a.out a.out && \
+    cp Fast-Quadric-Mesh-Simplification/a.out /app/a.out && \
     rm -r Fast-Quadric-Mesh-Simplification && \
     git clone https://github.com/timschmidt/stl2pov && \
     make -C stl2pov/ && \
