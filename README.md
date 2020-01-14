@@ -1,5 +1,7 @@
 # Thumbnail Renderer
 
+[![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/myminifactory/pluggable-thumbnail-renderer)](https://hub.docker.com/r/myminifactory/pluggable-thumbnail-renderer)
+
 Thumbnail Renderer is a docker container to generate a thumbnail from a 3D file.
 It uses :
 - [OpenCTM](http://openctm.sourceforge.net/?page=about) to convert the 3D file to stl.
