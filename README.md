@@ -2,7 +2,7 @@
 
 Thumbnail Renderer is a docker container to generate a thumbnail from a 3D file.
 It uses :
-- [assimp](https://github.com/assimp/assimp) to convert the 3D file to stl (see the `assimp` documentation for the supported file format).
+- [OpenCTM](http://openctm.sourceforge.net/?page=about) to convert the 3D file to stl.
 - [stl2pov](https://github.com/timschmidt/stl2pov) for the conversion from stl to .pov format supported by `Pov-Ray`.
 - [Pov-Ray](https://github.com/POV-Ray/povray) to render thumbnail.
 
