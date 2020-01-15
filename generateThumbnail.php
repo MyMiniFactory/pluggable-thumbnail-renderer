@@ -49,14 +49,24 @@ foreach ($filesToProcess as $file) {
         if(file_exists($file["objectPath"]) &&  strtolower($file_extension) != "stl"){
           echo(PHP_EOL."Converting file to stl".PHP_EOL);
             $stlPath = str_replace($file_extension, 'stl', $file["objectPath"]);
-            exec("ctmconv ".$file["objectPath"]." ".$stlPath);
+            exec("ctmconv ".$file["objectPath"]." ".$stlPath, $outputConv);
             if(file_exists($stlPath)){
               $file["objectPath"] = str_replace($file_extension, "stl", $file["objectPath"]);
             } else {
-              echo("Error unsuported file type for rendering");
-              $fp = fopen('/app/files/results.json', 'w');
+              echo("Error in conversion : ");
+              var_dump($outputConv);
+              array_push($statusJson, [
+                "file conversion" => [
+                  "status" => "error",
+                  "message" => $outputConv
+                ]
+              ]);
+              $fp = fopen($STATUSARG.'/status.json', 'w');
               fwrite($fp, json_encode($statusJson));
               fclose($fp);
+              $fp = fopen('/app/files/results.json', 'w');
+                    fwrite($fp, json_encode($statusJson));
+                    fclose($fp);
               return 0;
             }
         }
@@ -78,7 +88,7 @@ foreach ($filesToProcess as $file) {
       $path = "tmp/".$file["objectName"]."-simplified.stl";
       $percentageDecrease = 1 - round(($filesize - $treshold)/$filesize, 2, PHP_ROUND_HALF_DOWN);
       echo("Percentage to decrease: ".$percentageDecrease.PHP_EOL);
-      exec("/app/a.out ".$file["objectPath"]." ".$path." ".$percentageDecrease);
+      exec("/app/a.out ".$file["objectPath"]." ".$path." ".$percentageDecrease, $outputSimp);
       
       if (file_exists($path)){
 
@@ -86,16 +96,26 @@ foreach ($filesToProcess as $file) {
 
         echo("new size : ".filesize($file["objectPath"]).PHP_EOL);
       } else {
-        echo("Error while simplifying file");
+        echo("Error while simplifying file : ");
+        var_dump($outputSimp);
+        array_push($statusJson, [
+          "file simplification" => [
+            "status" => "error",
+            "message" => $outputSimp
+          ]
+        ]);
+        $fp = fopen($STATUSARG.'/status.json', 'w');
+        fwrite($fp, json_encode($statusJson));
+        fclose($fp);
         $fp = fopen('/app/files/results.json', 'w');
               fwrite($fp, json_encode($statusJson));
               fclose($fp);
-              return 0;
+        return 0;
       }
     };
 
     // Conversion to .pov with stl2pov
-    exec('/app/stl2pov '.$file["objectPath"].' > tmp/thumbnail-'.$file["objectName"].'.pov');
+    exec('/app/stl2pov '.$file["objectPath"].' > tmp/thumbnail-'.$file["objectName"].'.pov', $outputSTLPOV);
     if(!file_exists('tmp/thumbnail-'.$file["objectName"].'.pov')) {
         echo("Error reading the file data content");
 
@@ -103,7 +123,7 @@ foreach ($filesToProcess as $file) {
         array_push($statusJson, [
           "stl2pov conversion" => [
             "status" => "error",
-            "progress" => "100%"
+            "message" => $outputSTLPOV
           ]
         ]);
 
@@ -171,7 +191,7 @@ foreach ($filesToProcess as $file) {
         $command = 'povray "'.'tmp/thumbnail-'.$file["objectName"].'.pov'.'" +FN +W'.$Width.' +H'.$Height.' -O'.$outputfilepath.' +Q9 +AM1 +A +UA -D';
 
         // Executing Povray
-        exec($command);
+        exec($command, $outputPOV);
 
         // Checking if the thumbnail is generated.
         if(!file_exists($outputfilepath.'thumbnail-'.$file["objectName"].'.png')){
@@ -181,7 +201,7 @@ foreach ($filesToProcess as $file) {
           array_push($statusJson, [
             "Povray rendering" => [
               "status" => "error",
-              "progress" => "100%"
+              "message" => $outputPOV
             ]
           ]);
 
