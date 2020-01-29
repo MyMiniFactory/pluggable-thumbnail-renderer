@@ -49,25 +49,34 @@ foreach ($filesToProcess as $file) {
         if(file_exists($file["objectPath"]) &&  strtolower($file_extension) != "stl"){
           echo(PHP_EOL."Converting file to stl".PHP_EOL);
             $stlPath = str_replace($file_extension, 'stl', $file["objectPath"]);
-            exec("ctmconv ".$file["objectPath"]." ".$stlPath, $outputConv);
+            exec("ctmconv ".$file["objectPath"]." ".$stlPath, $outputConvCTM);
+            // exec("assimp export ".$file["objectPath"]." ".$stlPath, $outputConv);
             if(file_exists($stlPath)){
               $file["objectPath"] = str_replace($file_extension, "stl", $file["objectPath"]);
             } else {
-              echo("Error in conversion : ");
-              var_dump($outputConv);
-              array_push($statusJson, [
-                "file conversion" => [
-                  "status" => "error",
-                  "message" => $outputConv
-                ]
-              ]);
-              $fp = fopen($STATUSARG.'/status.json', 'w');
-              fwrite($fp, json_encode($statusJson));
-              fclose($fp);
-              $fp = fopen('/app/files/results.json', 'w');
-                    fwrite($fp, json_encode($statusJson));
-                    fclose($fp);
-              return 0;
+              echo("Error with CtmConv : ");
+              var_dump($outputConvCTM);
+              echo(PHP_EOL."Trying  with assimp");
+              exec("assimp export ".$file["objectPath"]." ".$stlPath, $outputConvASS);
+              if(file_exists($stlPath)){
+                $file["objectPath"] = str_replace($file_extension, "stl", $file["objectPath"]);
+              } else {
+                echo("Error while converting : ");
+                var_dump($outputConvASS);
+                array_push($statusJson, [
+                  "file conversion" => [
+                    "status" => "error",
+                    "message" => $outputConvASS
+                  ]
+                ]);
+                $fp = fopen($STATUSARG.'/status.json', 'w');
+                fwrite($fp, json_encode($statusJson));
+                fclose($fp);
+                $fp = fopen('/app/files/results.json', 'w');
+                      fwrite($fp, json_encode($statusJson));
+                      fclose($fp);
+                return 0;
+              }
             }
         }
     } else {
